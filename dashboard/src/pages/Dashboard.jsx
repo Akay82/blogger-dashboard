@@ -11,24 +11,26 @@ import {
   Settings
 } from "lucide-react";
 import "./Dashboard.css";
+import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
-
-  const StatCard = ({ icon, title, value, change, color }) => (
-    <div className="stat-card">
-      <div className={`stat-icon ${color}`}>
-        {icon}
-      </div>
-      <div className="stat-content">
-        <h3>{value}</h3>
-        <p>{title}</p>
-        {change && (
-          <span className={`stat-change ${change > 0 ? 'positive' : 'negative'}`}>
-            <TrendingUp size={14} /> {Math.abs(change)}%
-          </span>
-        )}
-      </div>
+const StatCard = ({ icon, title, value, change, color }) => (
+  <div className="stat-card">
+    <div className={`stat-icon ${color}`}>
+      {icon}
     </div>
-  );
+    <div className="stat-content">
+      <h3>{value}</h3>
+      <p>{title}</p>
+      {change && (
+        <span className={`stat-change ${change > 0 ? 'positive' : 'negative'}`}>
+          <TrendingUp size={14} /> {Math.abs(change)}%
+        </span>
+      )}
+    </div>
+  </div>
+);
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalPosts: 0,
@@ -38,100 +40,61 @@ const Dashboard = () => {
   });
   const [recentPosts, setRecentPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
-
+  const navigate = useNavigate();
   const fetchDashboardData = async () => {
-    // Simulate API delay
-    setTimeout(() => {
-      // Dummy data
-      const dummyPosts = [
-        {
-          id: 1,
-          title: "Getting Started with React",
-          content: "Learn how to build modern web applications with React",
-          author: "John Doe",
-          createdAt: "2024-01-15T10:30:00Z",
-          status: "published",
-          views: 1250,
-          likes: 89,
-          tags: ["react", "javascript", "webdev"],
-          image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop"
-        },
-        {
-          id: 2,
-          title: "Mastering TypeScript",
-          content: "TypeScript adds static typing to JavaScript for better developer experience",
-          author: "Jane Smith",
-          createdAt: "2024-01-20T14:45:00Z",
-          status: "draft",
-          views: 0,
-          likes: 0,
-          tags: ["typescript", "programming"],
-          image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&auto=format&fit=crop"
-        },
-        {
-          id: 3,
-          title: "CSS Grid vs Flexbox",
-          content: "A comprehensive comparison of CSS Grid and Flexbox",
-          author: "Alex Johnson",
-          createdAt: "2024-01-18T09:15:00Z",
-          status: "published",
-          views: 850,
-          likes: 45,
-          tags: ["css", "webdev", "frontend"],
-          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop"
-        },
-        {
-          id: 4,
-          title: "Node.js Best Practices",
-          content: "Essential best practices for Node.js development",
-          author: "Mike Wilson",
-          createdAt: "2024-01-22T16:20:00Z",
-          status: "scheduled",
-          views: 320,
-          likes: 23,
-          tags: ["nodejs", "backend", "javascript"],
-          image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
-        },
-        {
-          id: 5,
-          title: "Introduction to GraphQL",
-          content: "Learn the basics of GraphQL for API development",
-          author: "Sarah Chen",
-          createdAt: "2024-01-10T11:10:00Z",
-          status: "published",
-          views: 1560,
-          likes: 102,
-          tags: ["graphql", "api", "webdev"],
-          image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&auto=format&fit=crop"
-        }
-      ];
+    try {
+      setLoading(true);
+      const response = await api.get("/dashboard/summary");
+      const data = response.data;
+      
+      // Transform API data to match your UI structure
+      setStats({
+        totalPosts: data.posts?.total || 0,
+        totalViews: data.analytics?.totalViews || 0,
+        totalLikes: 0, // API doesn't provide likes data
+        activeUsers: 0 // API doesn't provide active users data
+      });
 
-      const dummyStats = {
-        totalPosts: dummyPosts.length,
-        totalViews: 12450,
-        totalLikes: 5678,
-        activeUsers: 234
-      };
+      // Transform recent posts data
+      const transformedPosts = data.recentPosts?.map((post, index) => ({
+        id: post._id || `post-${index}`,
+        title: post.title || "Unknown Post",
+        content: post.title, // Using title as content since API doesn't have content
+        author: "Blogger", // Default author since API doesn't have author info
+        createdAt: post.createdAt || new Date().toISOString(),
+        status: post.status || "unknown",
+        views: 0, // Not available in API for recent posts
+        likes: 0, // Not available in API for recent posts
+        tags: [], // Not available in API
+        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop", // Default image
+        slug: post.slug || "",
+        postUrl: post.blogger?.postUrl || "#"
+      })) || [];
 
-      setStats(dummyStats);
-      setRecentPosts(dummyPosts);
+      setRecentPosts(transformedPosts);
+      
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      // You could set error state here if needed
+    } finally {
       setLoading(false);
-    }, 1000); // 1 second delay to simulate API call
+    }
   };
+
   useEffect(() => {
-    // Simulate API call with dummy data
     fetchDashboardData();
   }, []);
 
-
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return "Invalid date";
+    }
   };
 
   if (loading) {
@@ -155,28 +118,28 @@ const Dashboard = () => {
           icon={<FileText size={24} />}
           title="Total Posts"
           value={stats.totalPosts}
-          change={12}
+          change={0} // No change data in API
           color="purple"
         />
         <StatCard
           icon={<Eye size={24} />}
           title="Total Views"
           value={stats.totalViews.toLocaleString()}
-          change={8}
+          change={0} // No change data in API
           color="blue"
         />
         <StatCard
           icon={<ThumbsUp size={24} />}
           title="Total Likes"
           value={stats.totalLikes.toLocaleString()}
-          change={15}
+          change={0} // No change data in API
           color="green"
         />
         <StatCard
           icon={<Users size={24} />}
           title="Active Users"
           value={stats.activeUsers}
-          change={-3}
+          change={0} // No change data in API
           color="orange"
         />
       </div>
@@ -185,7 +148,7 @@ const Dashboard = () => {
         <div className="recent-posts">
           <div className="section-header">
             <h2>Recent Posts</h2>
-            <button className="btn-secondary">View All</button>
+            <button   onClick={() => navigate('/posts')}  className="btn-secondary">View All</button>
           </div>
           <div className="posts-table">
             {recentPosts.length > 0 ? (
@@ -200,8 +163,8 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="post-status">
-                    <span className={`status-badge ${post.status || 'published'}`}>
-                      {post.status || 'Published'}
+                    <span className={`status-badge ${post.status || 'generated'}`}>
+                      {post.status || 'Generated'}
                     </span>
                   </div>
                 </div>

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  Search, 
-  Filter, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
   Eye,
   ChevronLeft,
   ChevronRight,
   Calendar,
-  FileText
+  FileText,
 } from "lucide-react";
 import api from "../api/axios";
 import "./PostList.css";
@@ -31,7 +31,9 @@ const PostList = () => {
 
   const fetchPosts = async (page = 1) => {
     try {
-      const response = await api.get(`/posts?page=${page}&limit=${postsPerPage}`);
+      const response = await api.get(
+        `/posts?page=${page}&limit=${postsPerPage}`
+      );
       setPosts(response.data.data || []);
       setTotalPosts(response.data.pagination?.total || 0);
       setTotalPages(response.data.pagination?.totalPages || 1);
@@ -54,53 +56,54 @@ const PostList = () => {
     }
   };
 
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.topic?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.topic?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filter === "all" || post.status === filter;
     return matchesSearch && matchesFilter;
   });
 
   const formatDate = (dateString) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch (error) {
-      return 'Invalid date';
+      return "Invalid date";
     }
   };
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case 'generated':
-        return 'pl-status-published';
-      case 'draft':
-        return 'pl-status-draft';
-      case 'published':
-        return 'pl-status-published';
-      case 'scheduled':
-        return 'pl-status-scheduled';
+      case "generated":
+        return "pl-status-published";
+      case "draft":
+        return "pl-status-draft";
+      case "published":
+        return "pl-status-published";
+      case "scheduled":
+        return "pl-status-scheduled";
       default:
-        return 'pl-status-draft';
+        return "pl-status-draft";
     }
   };
 
   const getStatusDisplayText = (status) => {
     switch (status) {
-      case 'generated':
-        return 'Generated';
-      case 'draft':
-        return 'Draft';
-      case 'published':
-        return 'Published';
-      case 'scheduled':
-        return 'Scheduled';
+      case "generated":
+        return "Generated";
+      case "draft":
+        return "Draft";
+      case "published":
+        return "Published";
+      case "scheduled":
+        return "Scheduled";
       default:
-        return 'Draft';
+        return "Draft";
     }
   };
 
@@ -142,10 +145,10 @@ const PostList = () => {
             className="pl-search-input"
           />
         </div>
-        
+
         <div className="pl-filter-group">
           <Filter size={18} />
-          <select 
+          <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="pl-filter-select"
@@ -179,10 +182,12 @@ const PostList = () => {
                     <td className="pl-td-title">
                       <div className="pl-post-cell">
                         <div className="pl-post-thumbnail">
-                          {post.images && post.images.length > 0 && post.images[0].url ? (
-                            <img 
-                              src={post.images[0].url} 
-                              alt={post.images[0].alt || post.title} 
+                          {post.images &&
+                          post.images.length > 0 &&
+                          post.images[0].url ? (
+                            <img
+                              src={post.images[0].url}
+                              alt={post.images[0].alt || post.title}
                               className="pl-thumbnail-img"
                             />
                           ) : (
@@ -190,7 +195,9 @@ const PostList = () => {
                           )}
                         </div>
                         <div className="pl-post-info">
-                          <h4 className="pl-post-title">{post.title || post.topic}</h4>
+                          <h4 className="pl-post-title">
+                            {post.title || post.topic}
+                          </h4>
                           <p className="pl-post-slug">/{post.slug}</p>
                           {post.topic && post.topic !== post.title && (
                             <p className="pl-post-topic">
@@ -202,11 +209,17 @@ const PostList = () => {
                     </td>
                     <td className="pl-td-provider">
                       <div className="pl-provider-cell">
-                        <span className={`pl-provider-badge ${post.aiProvider || 'unknown'}`}>
-                          {post.aiProvider || 'Unknown'}
+                        <span
+                          className={`pl-provider-badge ${
+                            post.aiProvider || "unknown"
+                          }`}
+                        >
+                          {post.aiProvider || "Unknown"}
                         </span>
                         {post.modelUsed && (
-                          <small className="pl-model-used">{post.modelUsed}</small>
+                          <small className="pl-model-used">
+                            {post.modelUsed}
+                          </small>
                         )}
                       </div>
                     </td>
@@ -214,37 +227,44 @@ const PostList = () => {
                       <div className="pl-date-cell">
                         <Calendar size={16} className="pl-date-icon" />
                         <div className="pl-date-info">
-                          <span className="pl-date-text">{formatDate(post.createdAt)}</span>
-                          {post.updatedAt && post.updatedAt !== post.createdAt && (
-                            <small className="pl-updated-text">Updated</small>
-                          )}
+                          <span className="pl-date-text">
+                            {formatDate(post.createdAt)}
+                          </span>
+                          {post.updatedAt &&
+                            post.updatedAt !== post.createdAt && (
+                              <small className="pl-updated-text">Updated</small>
+                            )}
                         </div>
                       </div>
                     </td>
                     <td className="pl-td-status">
-                      <span className={`pl-status-badge ${getStatusBadgeClass(post.status)}`}>
+                      <span
+                        className={`pl-status-badge ${getStatusBadgeClass(
+                          post.status
+                        )}`}
+                      >
                         {getStatusDisplayText(post.status)}
                       </span>
                     </td>
                     <td className="pl-td-actions">
                       <div className="pl-actions-cell">
-                      <a
-  href={post.blogger?.postUrl}
-  className="pl-action-btn pl-view-btn"
-  title="Preview"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <Eye size={16} />
-</a>
-                        <Link 
+                        <a
+                          href={post.blogger?.postUrl}
+                          className="pl-action-btn pl-view-btn"
+                          title="Preview"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye size={16} />
+                        </a>
+                        <Link
                           to={`/posts/edit/${post._id}`}
                           className="pl-action-btn pl-edit-btn"
                           title="Edit"
                         >
                           <Edit size={16} />
                         </Link>
-                        <button 
+                        <button
                           className="pl-action-btn pl-delete-btn"
                           onClick={() => handleDelete(post._id)}
                           title="Delete"
@@ -261,7 +281,9 @@ const PostList = () => {
                     <div className="pl-empty-state">
                       <FileText size={48} className="pl-empty-icon" />
                       <h4 className="pl-empty-title">No posts found</h4>
-                      <p className="pl-empty-text">Try changing your search or filter criteria</p>
+                      <p className="pl-empty-text">
+                        Try changing your search or filter criteria
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -278,9 +300,11 @@ const PostList = () => {
             <div key={post._id} className="pl-mobile-card">
               <div className="pl-card-header">
                 <div className="pl-card-thumbnail">
-                  {post.images && post.images.length > 0 && post.images[0].url ? (
-                    <img 
-                      src={post.images[0].url} 
+                  {post.images &&
+                  post.images.length > 0 &&
+                  post.images[0].url ? (
+                    <img
+                      src={post.images[0].url}
                       alt={post.images[0].alt || post.title}
                       className="pl-card-img"
                     />
@@ -289,48 +313,60 @@ const PostList = () => {
                   )}
                 </div>
                 <div className="pl-card-title">
-                  <h4 className="pl-card-post-title">{post.title || post.topic}</h4>
+                  <h4 className="pl-card-post-title">
+                    {post.title || post.topic}
+                  </h4>
                   <p className="pl-card-slug">/{post.slug}</p>
                 </div>
               </div>
-              
+
               <div className="pl-card-body">
                 <div className="pl-card-row">
                   <span className="pl-card-label">AI Provider:</span>
-                  <span className={`pl-provider-badge ${post.aiProvider || 'unknown'}`}>
-                    {post.aiProvider || 'Unknown'}
+                  <span
+                    className={`pl-provider-badge ${
+                      post.aiProvider || "unknown"
+                    }`}
+                  >
+                    {post.aiProvider || "Unknown"}
                   </span>
                 </div>
-                
+
                 <div className="pl-card-row">
                   <span className="pl-card-label">Status:</span>
-                  <span className={`pl-status-badge ${getStatusBadgeClass(post.status)}`}>
+                  <span
+                    className={`pl-status-badge ${getStatusBadgeClass(
+                      post.status
+                    )}`}
+                  >
                     {getStatusDisplayText(post.status)}
                   </span>
                 </div>
-                
+
                 <div className="pl-card-row">
                   <span className="pl-card-label">Created:</span>
-                  <span className="pl-card-date">{formatDate(post.createdAt)}</span>
+                  <span className="pl-card-date">
+                    {formatDate(post.createdAt)}
+                  </span>
                 </div>
               </div>
-              
+
               <div className="pl-card-actions">
-                <Link 
-                  to={`/posts/${post._id}`} 
+                <Link
+                  to={`/posts/${post._id}`}
                   className="pl-card-action-btn pl-card-view-btn"
                 >
                   <Eye size={16} />
                   <span className="pl-card-btn-text">View</span>
                 </Link>
-                <Link 
+                <Link
                   to={`/posts/edit/${post._id}`}
                   className="pl-card-action-btn pl-card-edit-btn"
                 >
                   <Edit size={16} />
                   <span className="pl-card-btn-text">Edit</span>
                 </Link>
-                <button 
+                <button
                   className="pl-card-action-btn pl-card-delete-btn"
                   onClick={() => handleDelete(post._id)}
                 >
@@ -344,7 +380,9 @@ const PostList = () => {
           <div className="pl-empty-state">
             <FileText size={48} className="pl-empty-icon" />
             <h4 className="pl-empty-title">No posts found</h4>
-            <p className="pl-empty-text">Try changing your search or filter criteria</p>
+            <p className="pl-empty-text">
+              Try changing your search or filter criteria
+            </p>
           </div>
         )}
       </div>
@@ -359,7 +397,7 @@ const PostList = () => {
             <ChevronLeft size={20} />
             <span className="pl-pagination-text">Previous</span>
           </button>
-          
+
           <div className="pl-page-numbers">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
@@ -372,11 +410,13 @@ const PostList = () => {
               } else {
                 pageNum = currentPage - 2 + i;
               }
-              
+
               return (
                 <button
                   key={pageNum}
-                  className={`pl-page-number ${currentPage === pageNum ? 'pl-active' : ''}`}
+                  className={`pl-page-number ${
+                    currentPage === pageNum ? "pl-active" : ""
+                  }`}
                   onClick={() => handlePageChange(pageNum)}
                 >
                   {pageNum}
@@ -384,10 +424,12 @@ const PostList = () => {
               );
             })}
           </div>
-          
+
           <button
             className="pl-pagination-btn pl-next-btn"
-            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+            onClick={() =>
+              handlePageChange(Math.min(currentPage + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             <span className="pl-pagination-text">Next</span>
