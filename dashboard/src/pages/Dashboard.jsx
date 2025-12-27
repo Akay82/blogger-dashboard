@@ -148,7 +148,7 @@ const Dashboard = () => {
         <div className="recent-posts">
           <div className="section-header">
             <h2>Recent Posts</h2>
-            <button   onClick={() => navigate('/posts')}  className="btn-secondary">View All</button>
+            <button   onClick={() => navigate('/posts')}  className="btn-secondary">View Alllll</button>
           </div>
           <div className="posts-table">
             {recentPosts.length > 0 ? (
