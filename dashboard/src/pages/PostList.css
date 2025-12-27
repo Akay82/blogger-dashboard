@@ -743,3 +743,38 @@
     justify-content: center;
   }
 }
+.pl-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.pl-card-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pl-card-action-btn:disabled svg {
+  color: #999;
+}
+
+.pl-card-action-btn:disabled .pl-card-btn-text {
+  color: #999;
+}
+.pl-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(60%);
+}
+.pl-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(60%);
+}
+
+.pl-disabled svg,
+.pl-disabled span {
+  color: #999;
+}

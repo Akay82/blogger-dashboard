@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import api from "../api/axios";
 import "./PostList.css";
+import { useAuth } from "../context/AuthContext";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -24,6 +25,8 @@ const PostList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
   const postsPerPage = 10;
+  const auth = useAuth();
+  const isGuest = auth?.isGuest || false;
 
   useEffect(() => {
     fetchPosts(currentPage);
@@ -46,6 +49,7 @@ const PostList = () => {
   };
 
   const handleDelete = async (id) => {
+    if (isGuest) return;
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
         await api.delete(`/posts/${id}`);
@@ -125,13 +129,30 @@ const PostList = () => {
       <div className="pl-header">
         <div className="pl-header-content">
           <h1 className="pl-title">Blog Posts</h1>
-          <p className="pl-subtitle">Manage all your blog posts in one place</p>
           <p className="pl-total-count">Total Posts: {totalPosts}</p>
+          {isGuest && (
+            <div className="pl-subtitle">
+              <small>
+                You are viewing as a guest. Some features are limited.
+              </small>
+            </div>
+          )}
         </div>
-        <Link to="/posts/new" className="pl-new-post-btn">
-          <Plus size={20} />
-          <span>New Post</span>
-        </Link>
+     {!isGuest ? (
+  <Link to="/posts/new" className="pl-new-post-btn">
+    <Plus size={20} />
+    <span>New Post</span>
+  </Link>
+) : (
+  <div
+    className="pl-new-post-btn pl-disabled"
+    title="Guests cannot create posts"
+  >
+    <Plus size={20} />
+    <span>Create Post</span>
+  </div>
+)}
+
       </div>
 
       <div className="pl-filters">
@@ -257,17 +278,28 @@ const PostList = () => {
                         >
                           <Eye size={16} />
                         </a>
-                        <Link
-                          to={`/posts/edit/${post._id}`}
-                          className="pl-action-btn pl-edit-btn"
-                          title="Edit"
-                        >
-                          <Edit size={16} />
-                        </Link>
+                        {!isGuest ? (
+                          <Link
+                            to={`/posts/edit/${post._id}`}
+                            className="pl-action-btn pl-edit-btn"
+                            title="Edit"
+                          >
+                            <Edit size={16} />
+                          </Link>
+                        ) : (
+                          <span
+                            className="pl-action-btn pl-edit-btn pl-disabled"
+                            title="Guests cannot edit"
+                          >
+                            <Edit size={16} />
+                          </span>
+                        )}
+
                         <button
                           className="pl-action-btn pl-delete-btn"
                           onClick={() => handleDelete(post._id)}
                           title="Delete"
+                          disabled={isGuest}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -359,16 +391,28 @@ const PostList = () => {
                   <Eye size={16} />
                   <span className="pl-card-btn-text">View</span>
                 </Link>
-                <Link
-                  to={`/posts/edit/${post._id}`}
-                  className="pl-card-action-btn pl-card-edit-btn"
-                >
-                  <Edit size={16} />
-                  <span className="pl-card-btn-text">Edit</span>
-                </Link>
+                {!isGuest ? (
+                  <Link
+                    to={`/posts/edit/${post._id}`}
+                    className="pl-card-action-btn pl-card-edit-btn"
+                  >
+                    <Edit size={16} />
+                    <span className="pl-card-btn-text">Edit</span>
+                  </Link>
+                ) : (
+                  <div
+                    className="pl-card-action-btn pl-card-edit-btn pl-disabled"
+                    title="Guests cannot edit"
+                  >
+                    <Edit size={16} />
+                    <span className="pl-card-btn-text">Edit</span>
+                  </div>
+                )}
+
                 <button
                   className="pl-card-action-btn pl-card-delete-btn"
                   onClick={() => handleDelete(post._id)}
+                  disabled={isGuest}
                 >
                   <Trash2 size={16} />
                   <span className="pl-card-btn-text">Delete</span>
