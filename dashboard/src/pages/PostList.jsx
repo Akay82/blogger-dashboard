@@ -48,6 +48,16 @@ const PostList = () => {
     }
   };
 
+const createPost = async () => {
+  try {
+    await api.post("/automation/run"); 
+    fetchPosts(1);
+  } catch (error) {
+    console.error("Error creating post:", error);
+  }
+};
+
+
   const handleDelete = async (id) => {
     if (isGuest) return;
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -139,10 +149,11 @@ const PostList = () => {
           )}
         </div>
      {!isGuest ? (
-  <Link to="/posts/new" className="pl-new-post-btn">
-    <Plus size={20} />
-    <span>New Post</span>
-  </Link>
+<button className="pl-new-post-btn" onClick={createPost}>
+  <Plus size={20} />
+  <span>New Post</span>
+</button>
+
 ) : (
   <div
     className="pl-new-post-btn pl-disabled"
