@@ -49,11 +49,14 @@ const PostList = () => {
   };
 
 const createPost = async () => {
+      setLoading(true); 
   try {
     await api.post("/automation/run"); 
     fetchPosts(1);
+    setLoading(false);
   } catch (error) {
     console.error("Error creating post:", error);
+    setLoading(false);
   }
 };
 
